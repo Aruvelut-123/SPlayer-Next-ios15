@@ -32,6 +32,7 @@ private func execute(_ request: [String: Any]) async throws -> [String: Any] {
   }
 }
 
+@available(iOS 16.0, *)
 struct PlaySPlayerIntent: AudioPlaybackIntent {
   static var title: LocalizedStringResource = "用 SPlayer 播放音乐"
   static var description = IntentDescription("按歌名搜索并播放音乐。")
@@ -52,26 +53,31 @@ struct PlaySPlayerIntent: AudioPlaybackIntent {
   }
 }
 
+@available(iOS 16.0, *)
 struct ResumeSPlayerIntent: AudioPlaybackIntent {
   static var title: LocalizedStringResource = "继续播放 SPlayer"
   static var openAppWhenRun = false
   func perform() async throws -> some IntentResult { _ = try await execute(["action": "resume"]); return .result() }
 }
+@available(iOS 16.0, *)
 struct PauseSPlayerIntent: AudioPlaybackIntent {
   static var title: LocalizedStringResource = "暂停 SPlayer"
   static var openAppWhenRun = false
   func perform() async throws -> some IntentResult { _ = try await execute(["action": "pause"]); return .result() }
 }
+@available(iOS 16.0, *)
 struct NextSPlayerIntent: AudioPlaybackIntent {
   static var title: LocalizedStringResource = "SPlayer 下一首"
   static var openAppWhenRun = false
   func perform() async throws -> some IntentResult { _ = try await execute(["action": "next"]); return .result() }
 }
+@available(iOS 16.0, *)
 struct PreviousSPlayerIntent: AudioPlaybackIntent {
   static var title: LocalizedStringResource = "SPlayer 上一首"
   static var openAppWhenRun = false
   func perform() async throws -> some IntentResult { _ = try await execute(["action": "previous"]); return .result() }
 }
+@available(iOS 16.0, *)
 struct SPlayerShortcuts: AppShortcutsProvider {
   static var appShortcuts: [AppShortcut] {
     AppShortcut(intent: PlaySPlayerIntent(), phrases: ["用\(.applicationName)播放音乐"], shortTitle: "播放音乐", systemImageName: "music.note")

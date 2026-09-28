@@ -37,7 +37,7 @@
       }
     ],
     "iOS": {
-      "minimumSystemVersion": "16.0"
+      "minimumSystemVersion": "15.8.8"
     },
     "icon": ["icons/icon.png"]
   },

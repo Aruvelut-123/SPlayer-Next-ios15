@@ -125,10 +125,18 @@
   align-items: center;
 }
 .apple-music-player .am-artwork > div {
-  width: min(100cqw, 100cqh);
-  height: min(100cqw, 100cqh);
+  /* iOS 15（无 container queries）兜底：等比方形撑满可用空间 */
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1;
   border-radius: 8px;
   box-shadow: 0 16px 44px #0004;
+}
+@supports (container-type: size) {
+  .apple-music-player .am-artwork > div {
+    width: min(100cqw, 100cqh);
+    height: min(100cqw, 100cqh);
+  }
 }
 .apple-music-player .am-song {
   display: flex;

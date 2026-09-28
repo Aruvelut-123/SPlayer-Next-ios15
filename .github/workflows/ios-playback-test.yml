@@ -87,7 +87,7 @@ jobs:
       - name: Test missing Siri signing capability
         timeout-minutes: 2
         run: |
-          xcrun --sdk iphonesimulator clang -target "$(uname -m)-apple-ios16.0-simulator" \
+          xcrun --sdk iphonesimulator clang -target "$(uname -m)-apple-ios15.8-simulator" \
             -isysroot "$(xcrun --sdk iphonesimulator --show-sdk-path)" \
             -fobjc-arc -fblocks -framework Foundation -framework Intents -framework Security \
             -I src-tauri/plugins/native-audio/ios/AuthorizationBridge/include \

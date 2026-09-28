@@ -29,7 +29,7 @@
 
 ## 安装与使用
 
-系统要求：**iOS / iPadOS 16.0+**
+系统要求：**iOS / iPadOS 15.8.8+**
 
 1. **获取安装包**：前往 [Releases](https://github.com/q3cc/SPlayer-Next-ios/releases/latest) 下载最新的未签名 `.ipa`（开发版请至 [Actions](https://github.com/q3cc/SPlayer-Next-ios/actions/workflows/ios-unsigned.yml) 下载构建产物）。
 2. **签名安装**：使用个人证书或签名工具（如 TrollStore、AltStore、SideStore、牛蛙助手等）自签名并安装。
