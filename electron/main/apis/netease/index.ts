@@ -178,6 +178,22 @@ const parseSetCookie = (arr: string[]): Record<string, string> => {
   return out;
 };
 
+/** 响应体里的 cookie 字符串（如扫码登录 803 的 body.cookie）→ 扁平对象 */
+const parseBodyCookieString = (raw: unknown): Record<string, string> => {
+  const out: Record<string, string> = {};
+  if (typeof raw !== "string" || !raw) return out;
+  for (const part of raw.split(";")) {
+    const eq = part.indexOf("=");
+    if (eq <= 0) continue;
+    const key = part.slice(0, eq).trim();
+    const val = part.slice(eq + 1).trim();
+    if (!key) continue;
+    if (["path", "domain", "expires", "max-age", "secure", "httponly", "samesite", "version"].includes(key.toLowerCase())) continue;
+    out[key] = val;
+  }
+  return out;
+};
+
 /** 确保未登录时已有稳定的 MUSIC_A 与 deviceId */
 export const ensureNeteaseAnonymousSession = async (): Promise<void> => {
   const sessionState = loadSession();
@@ -274,6 +290,9 @@ export const callNetease = async (
   // 仅登录态变更接口才把响应 cookie 写回 SQLite
   if (SESSION_MUTATING.has(name)) {
     const patch = parseSetCookie(res.cookie ?? []);
+    // 移动端（WKWebView / tauri-http）的 HTTP set-cookie 可能不可读，
+    // 扫码登录 803 的权威登录态（MUSIC_U 等）位于响应体 body.cookie，必须兜底合并。
+    Object.assign(patch, parseBodyCookieString((res.body as { cookie?: unknown }).cookie));
     if (name === "register_anonimous") {
       const token = (res.body as { token?: unknown }).token;
       if (typeof token === "string") patch.MUSIC_A = token;

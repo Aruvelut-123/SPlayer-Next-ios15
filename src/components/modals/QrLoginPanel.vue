@@ -102,6 +102,16 @@ const poll = async (): Promise<void> => {
 
 const { pause, resume } = useIntervalFn(poll, 1500, { immediate: false });
 
+// 移动端切后台（去扫码 App 确认）时 WKWebView 的 JS 定时器会被挂起节流，
+// 切回前台立即补一次轮询，避免确认结果因定时器延迟而撞上 key 过期（800）。
+let visibilityListener: (() => void) | undefined;
+if (typeof document !== "undefined") {
+  visibilityListener = () => {
+    if (document.visibilityState === "visible") void poll();
+  };
+  document.addEventListener("visibilitychange", visibilityListener);
+}
+
 watch(
   () => props.active,
   (active) => {
@@ -119,6 +129,10 @@ watch(
 onBeforeUnmount(() => {
   generation++;
   pause();
+  if (visibilityListener && typeof document !== "undefined") {
+    document.removeEventListener("visibilitychange", visibilityListener);
+    visibilityListener = undefined;
+  }
 });
 
 defineExpose({ pause, resume, refresh });
