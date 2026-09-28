@@ -14,7 +14,7 @@
 
 ## 快速开始
 
-需要 iOS / iPadOS 15.8.8 或更高版本，以及自己的签名工具和证书。
+需要 iOS / iPadOS 15.8 或更高版本，以及自己的签名工具和证书。
 
 1. 从 [Releases](https://github.com/q3cc/SPlayer-Next-ios/releases/latest) 下载未签名 IPA，签名后安装。
 2. 首次打开完成引导，登录网易云账号，或在曲库中添加音乐文件夹。

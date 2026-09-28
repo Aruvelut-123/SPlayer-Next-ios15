@@ -5,7 +5,7 @@ targets:
   LayoutTests:
     type: bundle.ui-testing
     platform: iOS
-    deploymentTarget: "15.8.8"
+    deploymentTarget: "15.8"
     sources:
       - LayoutTests.swift
       - PlaybackTests.swift

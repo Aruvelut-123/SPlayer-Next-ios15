@@ -44,7 +44,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "dist-mobile",
     emptyOutDir: true,
-    // Vite 7 默认 baseline-widely-available（≈Safari 16.4）；iOS 15.8.8 的
+    // Vite 7 默认 baseline-widely-available（≈Safari 16.4）；iOS 15.8 的
     // WKWebView 需要 es2020 级语法才能解析，与 vite.siri.config.ts 保持一致。
     target: "es2020",
     rollupOptions: { input: resolve(__dirname, "index.html") },
