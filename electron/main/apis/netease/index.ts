@@ -188,7 +188,19 @@ const parseBodyCookieString = (raw: unknown): Record<string, string> => {
     const key = part.slice(0, eq).trim();
     const val = part.slice(eq + 1).trim();
     if (!key) continue;
-    if (["path", "domain", "expires", "max-age", "secure", "httponly", "samesite", "version"].includes(key.toLowerCase())) continue;
+    if (
+      [
+        "path",
+        "domain",
+        "expires",
+        "max-age",
+        "secure",
+        "httponly",
+        "samesite",
+        "version",
+      ].includes(key.toLowerCase())
+    )
+      continue;
     out[key] = val;
   }
   return out;
