@@ -6,7 +6,7 @@
 
 让 SPlayer Next 在 iPhone 和 iPad 上运行。
 
-[下载 IPA](https://github.com/q3cc/SPlayer-Next-ios/releases/latest) · [反馈问题](https://github.com/q3cc/SPlayer-Next-ios/issues) · [原项目](https://github.com/SPlayer-Dev/SPlayer-Next)
+[下载 IPA](https://github.com/Aruvelut-123/SPlayer-Next-ios15/releases/latest) · [反馈问题](https://github.com/Aruvelut-123/SPlayer-Next-ios15/issues) · [原项目](https://github.com/SPlayer-Dev/SPlayer-Next)
 
 </div>
 
@@ -16,11 +16,11 @@
 
 需要 iOS / iPadOS 15.8 或更高版本，以及自己的签名工具和证书。
 
-1. 从 [Releases](https://github.com/q3cc/SPlayer-Next-ios/releases/latest) 下载未签名 IPA，签名后安装。
+1. 从 [Releases](https://github.com/Aruvelut-123/SPlayer-Next-ios15/releases/latest) 下载未签名 IPA，签名后安装。
 2. 首次打开完成引导，登录网易云账号，或在曲库中添加音乐文件夹。
 3. 播放歌曲后，可在“设置 → 桌面歌词”开启歌词小窗。
 
-开发中的安装包在 [Actions](https://github.com/q3cc/SPlayer-Next-ios/actions/workflows/ios-unsigned.yml) 的成功构建页面底部，下载 Artifacts 并解压即可得到 IPA。
+开发中的安装包在 [Actions](https://github.com/Aruvelut-123/SPlayer-Next-ios15/actions/workflows/ios-unsigned.yml) 的成功构建页面底部，下载 Artifacts 并解压即可得到 IPA。
 
 ## 特性
 
@@ -69,7 +69,7 @@ iOS 使用系统 WebView 播放音频，不包含桌面版的 Electron 和 FFmpe
 本地构建需要 macOS、Xcode、Rust iOS target、Node.js 22.19.0 或更高版本，以及项目指定的 pnpm。
 
 ```bash
-git clone https://github.com/q3cc/SPlayer-Next-ios.git
+git clone https://github.com/Aruvelut-123/SPlayer-Next-ios15.git
 cd SPlayer-Next-ios
 git switch main
 pnpm install --frozen-lockfile

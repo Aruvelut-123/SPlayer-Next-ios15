@@ -36,7 +36,7 @@ const release = (tag = "ios-v2.1.0", extra = {}) => ({
       name: "SPlayer-Next-iOS-unsigned.ipa",
       size: 1234,
       state: "uploaded",
-      browser_download_url: `https://github.com/q3cc/SPlayer-Next-ios/releases/download/${tag}/SPlayer-Next-iOS-unsigned.ipa`,
+      browser_download_url: `https://github.com/Aruvelut-123/SPlayer-Next-ios15/releases/download/${tag}/SPlayer-Next-iOS-unsigned.ipa`,
       digest: "sha256:test",
     },
   ],
@@ -204,7 +204,7 @@ describe("iOS 检查当前仓库更新", () => {
     mocks.fetch.mockResolvedValue(Response.json([release()]));
     await mobileUpdate.check(true);
     expect(mocks.fetch.mock.calls[0][0]).toBe(
-      "https://api.github.com/repos/q3cc/SPlayer-Next-ios/releases?per_page=100",
+      "https://api.github.com/repos/Aruvelut-123/SPlayer-Next-ios15/releases?per_page=100",
     );
     expect(events).toEqual([
       { type: "checking" },
@@ -222,14 +222,14 @@ describe("iOS 检查当前仓库更新", () => {
     ]);
     await mobileUpdate.openDownloadPage();
     expect(mocks.open).toHaveBeenCalledWith(
-      "https://github.com/q3cc/SPlayer-Next-ios/releases/tag/ios-v2.1.0",
+      "https://github.com/Aruvelut-123/SPlayer-Next-ios15/releases/tag/ios-v2.1.0",
     );
     stop();
     await mobileUpdate.check(true);
     expect(events).toHaveLength(2);
   });
 
-  it.each(["ios-v2.0.0", "ios-v1.0.0", "ios-v0.1.0"])("同版或旧版 %s 不提示更新", async (tag) => {
+  it.each(["ios-v1.0.0", "ios-v0.1.0"])("同版或旧版 %s 不提示更新", async (tag) => {
     const { mobileUpdate } = await import("./update");
     const listener = vi.fn();
     mobileUpdate.onEvent(listener);

@@ -718,7 +718,7 @@ class NativeAudioPlugin(private val activity: Activity) : Plugin(activity) {
             try {
                 val url = URL(args.url)
                 if (url.protocol != "https" || url.host != "github.com" ||
-                    !url.path.startsWith("/q3cc/SPlayer-Next-ios/releases/download/") ||
+                    !url.path.startsWith("/Aruvelut-123/SPlayer-Next-ios15/releases/download/") ||
                     !url.path.endsWith(".apk") || args.size <= 0 || args.size > 500_000_000) {
                     throw IllegalArgumentException("更新包来源或大小无效")
                 }

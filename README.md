@@ -6,7 +6,7 @@
 
 适用于 iPhone 和 iPad 的 [SPlayer Next](https://github.com/SPlayer-Dev/SPlayer-Next) 移动适配版（基于 Tauri）。
 
-[下载 IPA](https://github.com/q3cc/SPlayer-Next-ios/releases/latest) · [反馈问题](https://github.com/q3cc/SPlayer-Next-ios/issues) · [上游项目](https://github.com/SPlayer-Dev/SPlayer-Next)
+[下载 IPA](https://github.com/Aruvelut-123/SPlayer-Next-ios15/releases/latest) · [反馈问题](https://github.com/Aruvelut-123/SPlayer-Next-ios15/issues) · [上游项目](https://github.com/SPlayer-Dev/SPlayer-Next)
 
 </div>
 
@@ -31,7 +31,7 @@
 
 系统要求：**iOS / iPadOS 15.8+**
 
-1. **获取安装包**：前往 [Releases](https://github.com/q3cc/SPlayer-Next-ios/releases/latest) 下载最新的未签名 `.ipa`（开发版请至 [Actions](https://github.com/q3cc/SPlayer-Next-ios/actions/workflows/ios-unsigned.yml) 下载构建产物）。
+1. **获取安装包**：前往 [Releases](https://github.com/Aruvelut-123/SPlayer-Next-ios15/releases/latest) 下载最新的未签名 `.ipa`（开发版请至 [Actions](https://github.com/Aruvelut-123/SPlayer-Next-ios15/actions/workflows/ios-unsigned.yml) 下载构建产物）。
 2. **签名安装**：使用个人证书或签名工具（如 TrollStore、AltStore、SideStore、牛蛙助手等）自签名并安装。
 3. **启用歌词**：在应用内进入“设置 → 桌面歌词”开启悬浮小窗歌词。
 4. **配置 Siri**：在“设置 → Siri”开启语音控制，选择音乐来源、搜索范围和选歌确认方式。可尝试“用 SPlayer 播放晴天”，或在快捷指令中添加 SPlayer 的播放、暂停和切歌操作。此功能仍需实机验证。
@@ -52,7 +52,7 @@
 
 1. 进入“设置 → 通用 → 调试”开启“日志记录”，随后复现问题。
 2. 打开 iOS 自带的“文件”App，依次进入：`我的 iPhone/iPad → SPlayer Next → logs`。
-3. 导出对应时间的 `.log` 文件，并在 [提交 Issue](https://github.com/q3cc/SPlayer-Next-ios/issues) 时附上日志、机型与系统版本。
+3. 导出对应时间的 `.log` 文件，并在 [提交 Issue](https://github.com/Aruvelut-123/SPlayer-Next-ios15/issues) 时附上日志、机型与系统版本。
 
 ---
 
@@ -61,7 +61,7 @@
 环境依赖：macOS、Xcode、Rust (iOS Target)、Node.js >= 22.19.0、pnpm。
 
 ```bash
-git clone [https://github.com/q3cc/SPlayer-Next-ios.git](https://github.com/q3cc/SPlayer-Next-ios.git)
+git clone [https://github.com/Aruvelut-123/SPlayer-Next-ios15.git](https://github.com/Aruvelut-123/SPlayer-Next-ios15.git)
 cd SPlayer-Next-ios
 git switch main
 

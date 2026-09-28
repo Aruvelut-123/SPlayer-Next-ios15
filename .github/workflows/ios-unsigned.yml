@@ -168,7 +168,7 @@ jobs:
   publish-action:
     name: Publish Action update channel
     needs: [checks, build-ios]
-    if: github.repository == 'q3cc/SPlayer-Next-ios' && github.ref == 'refs/heads/main'
+    if: github.repository == 'Aruvelut-123/SPlayer-Next-ios15' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write

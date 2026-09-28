@@ -13,7 +13,7 @@ export interface Contributor {
 }
 
 /** iOS 版本仓库 */
-export const IOS_REPO_SLUG = "q3cc/SPlayer-Next-ios";
+export const IOS_REPO_SLUG = "Aruvelut-123/SPlayer-Next-ios15";
 /** 原版仓库 */
 export const ORIGINAL_REPO_SLUG = "SPlayer-Dev/SPlayer-Next";
 

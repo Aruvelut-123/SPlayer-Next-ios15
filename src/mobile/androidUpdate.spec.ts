@@ -22,7 +22,7 @@ const asset = (arch: string) => ({
   size: 1234,
   state: "uploaded",
   digest: "sha256:deadbeef",
-  browser_download_url: `https://github.com/q3cc/SPlayer-Next-ios/releases/download/android-action-latest/SPlayer-Next-Android-${arch}-abcdef0.apk`,
+  browser_download_url: `https://github.com/Aruvelut-123/SPlayer-Next-ios15/releases/download/android-action-latest/SPlayer-Next-Android-${arch}-abcdef0.apk`,
 });
 const release = (commit = "abcdef0" + "1".repeat(33)) => ({
   tag_name: "android-action-latest",

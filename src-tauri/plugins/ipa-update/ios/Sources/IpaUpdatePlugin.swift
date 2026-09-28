@@ -39,7 +39,7 @@ final class IpaUpdatePlugin: Plugin {
     DispatchQueue.main.async {
       guard self.downloadTask == nil else { invoke.reject("已有 IPA 下载任务"); return }
       guard let url = URL(string: request.url), url.scheme == "https", url.host == "github.com",
-            url.path.hasPrefix("/q3cc/SPlayer-Next-ios/releases/download/"), url.path.hasSuffix(".ipa")
+            url.path.hasPrefix("/Aruvelut-123/SPlayer-Next-ios15/releases/download/"), url.path.hasSuffix(".ipa")
       else { invoke.reject("仅允许下载当前仓库的 IPA"); return }
       let root = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
         .appendingPathComponent("IpaUpdates", isDirectory: true)

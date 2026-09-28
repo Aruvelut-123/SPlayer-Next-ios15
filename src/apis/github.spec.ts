@@ -34,8 +34,8 @@ it("iOS 贡献只读取与原版不同的提交，翻页后去重并排除机器
   const contributors = await getContributors(IOS_REPO_SLUG, { compareBase: "SPlayer-Dev:main" });
   expect(contributors.map((item) => item.login)).toEqual(["q3cc", "ios-contributor"]);
   expect(fetch.mock.calls.map(([url]) => url)).toEqual([
-    "https://api.github.com/repos/q3cc/SPlayer-Next-ios/compare/SPlayer-Dev:main...main?per_page=100&page=1",
-    "https://api.github.com/repos/q3cc/SPlayer-Next-ios/compare/SPlayer-Dev:main...main?per_page=100&page=2",
+    "https://api.github.com/repos/Aruvelut-123/SPlayer-Next-ios15/compare/SPlayer-Dev:main...main?per_page=100&page=1",
+    "https://api.github.com/repos/Aruvelut-123/SPlayer-Next-ios15/compare/SPlayer-Dev:main...main?per_page=100&page=2",
   ]);
 });
 

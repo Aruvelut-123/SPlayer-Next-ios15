@@ -15,7 +15,7 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock("@/apis/github", () => ({
   getContributors: mocks.contributors,
-  IOS_REPO_SLUG: "q3cc/SPlayer-Next-ios",
+  IOS_REPO_SLUG: "Aruvelut-123/SPlayer-Next-ios15",
   ORIGINAL_REPO_SLUG: "SPlayer-Dev/SPlayer-Next",
 }));
 vi.mock("@/composables/useCopyText", () => ({ useCopyText: () => ({ copy: mocks.copy }) }));
@@ -32,9 +32,9 @@ vi.mock("@/utils/config", () => ({
     return mocks.isIOS;
   },
   APP_VERSION: "2.0.0",
-  REPO_URL: "https://github.com/q3cc/SPlayer-Next-ios",
+  REPO_URL: "https://github.com/Aruvelut-123/SPlayer-Next-ios15",
   REPO_NAME: "SPlayer-Next-ios",
-  HOMEPAGE_URL: "https://github.com/q3cc/SPlayer-Next-ios",
+  HOMEPAGE_URL: "https://github.com/Aruvelut-123/SPlayer-Next-ios15",
   COPYRIGHT_HOLDER: "imsyy",
   IS_APPX: false,
   COMMIT_HASH: "1234567",
@@ -134,7 +134,7 @@ it.each(["success", "empty", "error"])("iOS 贡献者隔离及作者署名：%s"
   );
   expect(ios.text()).not.toContain("upstream-user");
   expect(original.text()).toContain("upstream-user");
-  expect(mocks.contributors).toHaveBeenCalledWith("q3cc/SPlayer-Next-ios", {
+  expect(mocks.contributors).toHaveBeenCalledWith("Aruvelut-123/SPlayer-Next-ios15", {
     compareBase: "SPlayer-Dev:main",
   });
   wrapper.unmount();
