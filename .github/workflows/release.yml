@@ -59,7 +59,8 @@ jobs:
     needs: resolve-version
     uses: ./.github/workflows/build-ios-ipa.yml
     with:
-      ref: ${{ env.RELEASE_TAG }}
+      # 注意：jobs.<id>.with 不支持 env 上下文，这里直接内联标签表达式
+      ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
       artifact-name: SPlayer-Next-iOS-unsigned
       ipa-name: SPlayer-Next-iOS-unsigned-${{ needs.resolve-version.outputs.version }}.ipa
 
