@@ -1,8 +1,10 @@
 # iOS / iPadOS 未签名构建
 
-仓库的 `Build unsigned iOS IPA` 工作流在 GitHub 托管的 macOS runner 上调用 Tauri 官方 `ios build --no-sign` 流程，生成 iOS 工程、使用设备 SDK 编译，并上传 `SPlayer-Next-iOS-unsigned.ipa`。
+仓库的 `Build unsigned iOS IPA` 工作流在 GitHub 托管的 macOS runner 上调用 Tauri 官方 `ios build --no-sign` 流程，生成 iOS 工程、使用设备 SDK 编译，并上传 `SPlayer-Next-iOS-unsigned.ipa`。实际构建逻辑位于可复用工作流 `.github/workflows/build-ios-ipa.yml`，供日常构建与正式发布共用。
 
 ## 获取构建
+
+发布版：标签 `v*` 触发的 `Release` 工作流会一并构建 IPA，作为 `SPlayer-Next-iOS-unsigned-<版本>.ipa` 上传到 GitHub Release（与桌面安装包同一批资源）。开发版：在 Actions 下载日常构建产物。
 
 1. 打开仓库的 **Actions** 页面。
 2. 选择 **Build unsigned iOS IPA**。

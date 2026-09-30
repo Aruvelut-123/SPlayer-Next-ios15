@@ -1,5 +1,8 @@
 # tag（v*）触发
-# 各架构原生 runner 构建 → 合并清单 → 创建 GitHub 草稿 Release
+# 只构建 iOS / iPadOS 未签名 IPA → 创建 GitHub Release
+# iOS 端的更新检测直接读 GitHub Releases API（见 src/mobile/update.ts），
+# 因此这里必须把 IPA 作为 Release 资源上传，并维护稳定版 / beta / alpha 的
+# prerelease 语义，客户端才能正确识别通道与版本。
 name: Release
 
 on:
@@ -26,145 +29,44 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # 各平台/架构在对应的原生 runner 上独立构建
-  build:
-    name: Build on ${{ matrix.name }}
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Windows x64
-            runner: windows-latest
-            target: windows-x64
-          - name: Windows arm64
-            runner: windows-11-arm
-            target: windows-arm64
-          - name: macOS x64
-            runner: macos-15-intel
-            target: macos-x64
-          - name: macOS arm64
-            runner: macos-latest
-            target: macos-arm64
-          - name: Linux x64
-            runner: ubuntu-latest
-            target: linux-x64
-          - name: Linux arm64
-            runner: ubuntu-24.04-arm
-            target: linux-arm64
+  # 解析 package.json 版本：校验标签一致，并供 IPA 命名使用
+  resolve-version:
+    name: Resolve release version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Check out git repository
         uses: actions/checkout@v5
         with:
           ref: ${{ env.RELEASE_TAG }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: ". -> target"
-
-      # 校验标签、版本和更新通道
-      - name: Verify release metadata
+      - name: Read version from package.json
+        id: version
         shell: bash
         run: |
           VERSION="$(node -p "require('./package.json').version")"
+          # v* 标签必须与 package.json 版本一致，客户端按标签名解析版本号
           if [ "v$VERSION" != "$RELEASE_TAG" ]; then
             echo "标签 $RELEASE_TAG 与 package.json 版本 v$VERSION 不一致"
             exit 1
           fi
-          case "$VERSION" in
-            *-alpha|*-alpha.*)
-              echo "UPDATE_CHANNEL=alpha" >> "$GITHUB_ENV"
-              ;;
-            *-beta|*-beta.*)
-              echo "UPDATE_CHANNEL=beta" >> "$GITHUB_ENV"
-              ;;
-            *-*)
-              echo "不支持的预发布版本格式: $VERSION"
-              exit 1
-              ;;
-            *)
-              echo "UPDATE_CHANNEL=latest" >> "$GITHUB_ENV"
-              ;;
-          esac
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      # Linux: 安装系统构建/打包依赖
-      - name: 安装系统依赖 (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -y \
-            libasound2-dev libdbus-1-dev libpipewire-0.3-dev libpulse-dev pkg-config clang \
-            rpm libarchive-tools
+  # 唯一的构建产物：未签名 iOS / iPadOS IPA
+  build-ios:
+    name: Unsigned iPhone and iPad IPA
+    needs: resolve-version
+    uses: ./.github/workflows/build-ios-ipa.yml
+    with:
+      ref: ${{ env.RELEASE_TAG }}
+      artifact-name: SPlayer-Next-iOS-unsigned
+      ipa-name: SPlayer-Next-iOS-unsigned-${{ needs.resolve-version.outputs.version }}.ipa
 
-      # 清理旧构建产物
-      - name: Clean workspace
-        shell: bash
-        run: rm -rf dist out
-
-      # CI 不需要国内镜像
-      - name: 移除 .npmrc
-        shell: bash
-        run: rm -f .npmrc
-
-      # 安装项目依赖
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      # 仅构建本机架构
-      - name: Build ${{ matrix.name }}
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CSC_IDENTITY_AUTO_DISCOVERY: false
-        run: |
-          case "${{ matrix.target }}" in
-            windows-x64)
-              pnpm build:win --x64 --publish never
-              ;;
-            windows-arm64)
-              pnpm build:win --arm64 --publish never
-              ;;
-            macos-x64)
-              pnpm build:mac --x64 --publish never
-              ;;
-            macos-arm64)
-              pnpm build:mac --arm64 --publish never
-              ;;
-            linux-x64)
-              pnpm build:linux --x64 --publish never
-              ;;
-            linux-arm64)
-              pnpm build:linux --arm64 --publish never
-              ;;
-            *)
-              echo "Unsupported target: ${{ matrix.target }}"
-              exit 1
-              ;;
-          esac
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: SPlayer-Next-${{ matrix.name }}
-          path: dist/*.*
-
-  # 合并多架构更新清单并创建 GitHub 草稿 Release
+  # 把 IPA 挂到 GitHub Release，供客户端检测更新并下载
   release:
     name: Create GitHub Release
-    needs: build
+    needs: [resolve-version, build-ios]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -174,19 +76,18 @@ jobs:
         with:
           ref: ${{ env.RELEASE_TAG }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Download IPA artifact
+        uses: actions/download-artifact@v8
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          name: SPlayer-Next-iOS-unsigned
+          path: release-assets
 
-      - name: Verify release metadata
+      # 资源命名必须与客户端匹配规则一致：
+      # 稳定期用 SPlayer-Next-iOS-unsigned-<版本>.ipa，Action 通道用固定名
+      - name: Verify release assets
         shell: bash
         run: |
           VERSION="$(node -p "require('./package.json').version")"
-          if [ "v$VERSION" != "$RELEASE_TAG" ]; then
-            echo "标签 $RELEASE_TAG 与 package.json 版本 v$VERSION 不一致"
-            exit 1
-          fi
           case "$VERSION" in
             *-alpha|*-alpha.*)
               echo "UPDATE_CHANNEL=alpha" >> "$GITHUB_ENV"
@@ -202,27 +103,18 @@ jobs:
               echo "UPDATE_CHANNEL=latest" >> "$GITHUB_ENV"
               ;;
           esac
-          echo "APP_VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      - name: Download all artifacts
-        uses: actions/download-artifact@v8
-        with:
-          path: artifacts
-
-      # 整理待发布资源
-      - name: Prepare release assets
-        shell: bash
-        run: |
-          npm install --no-save --prefix "$RUNNER_TEMP/jsyaml" js-yaml@4.1.0
-          NODE_PATH="$RUNNER_TEMP/jsyaml/node_modules" \
-            node --test .github/scripts/prepare-release-assets.test.cjs
-          NODE_PATH="$RUNNER_TEMP/jsyaml/node_modules" \
-            node .github/scripts/prepare-release-assets.cjs artifacts release-assets "$APP_VERSION"
+          expected="SPlayer-Next-iOS-unsigned-$VERSION.ipa"
+          if [ ! -f "release-assets/$expected" ]; then
+            echo "缺少 iOS 产物: $expected"
+            ls -1R release-assets
+            exit 1
+          fi
           echo "待发布资源："
           ls -1 release-assets
 
       # 用官方 gh CLI 确定性创建 Release
-      # 正式版保持草稿，预览版直接发布为 prerelease
+      # 正式版保持草稿，预览版直接发布为 prerelease（客户端据此区分通道）
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

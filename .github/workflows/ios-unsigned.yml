@@ -8,6 +8,7 @@ on:
       - feat/ios-ipados
     paths:
       - ".github/workflows/ios-unsigned.yml"
+      - ".github/workflows/build-ios-ipa.yml"
       - ".github/workflows/ci.yml"
       - "vitest.config.ts"
       - "tsconfig*.json"
@@ -54,116 +55,12 @@ jobs:
 
   build-ios:
     name: Unsigned iPhone and iPad IPA
-    runs-on: macos-15
-    timeout-minutes: 35
-    env:
-      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11.5.2
-          run_install: false
-
-      - name: Select Xcode 26 for system artwork
-        run: |
-          xcode_app=$(find /Applications -maxdepth 1 -name 'Xcode_26*.app' -print | sort -V | tail -n 1)
-          test -n "$xcode_app"
-          sudo xcode-select -s "$xcode_app/Contents/Developer"
-          xcodebuild -version
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22.19.0
-          cache: pnpm
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: aarch64-apple-ios
-
-      - name: Cache Rust artifacts
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: src-tauri
-          cache-workspace-crates: true
-          key: ios-device-${{ hashFiles('src-tauri/**/*.rs', 'src-tauri/**/*.swift', 'src-tauri/**/*.m', 'src-tauri/**/*.h') }}
-
-      - name: Install frontend dependencies
-        run: pnpm install --frozen-lockfile --ignore-scripts
-
-      - name: Generate the Xcode project
-        run: pnpm tauri ios init --ci --skip-targets-install
-
-      - name: Test native Siri queue and runtime
-        run: |
-          pnpm vite build --config vite.siri.config.ts --mode mobile
-          swiftc src-tauri/plugins/native-audio/ios/Sources/SiriQueue.swift src-tauri/plugins/native-audio/ios/Sources/SiriSelection.swift scripts/ios-siri-tests/main.swift -o "$RUNNER_TEMP/splayer-siri-tests"
-          "$RUNNER_TEMP/splayer-siri-tests"
-          swiftc src-tauri/plugins/native-audio/ios/Sources/SiriQueue.swift src-tauri/plugins/native-audio/ios/Sources/SiriRuntime.swift scripts/ios-siri-tests/RuntimeTests.swift -o "$RUNNER_TEMP/splayer-siri-runtime-tests"
-          "$RUNNER_TEMP/splayer-siri-runtime-tests" src-tauri/plugins/native-audio/ios/Sources/Resources
-
-      - name: Test native IPA range downloader
-        run: python3 scripts/ios-update-tests/test_download.py
-
-      - name: Test native equalizer audio output
-        run: |
-          swiftc src-tauri/plugins/native-audio/ios/Sources/AudioEffects.swift scripts/ios-audio-tests/main.swift -o "$RUNNER_TEMP/splayer-audio-tests"
-          "$RUNNER_TEMP/splayer-audio-tests"
-
-      - name: Test native FLAC seek positions
-        run: |
-          swiftc src-tauri/vendor/AudioStreaming/AudioStreaming/Streaming/AudioPlayer/Processors/FlacSeekTable.swift scripts/ios-seek-tests/main.swift -o "$RUNNER_TEMP/splayer-seek-tests"
-          "$RUNNER_TEMP/splayer-seek-tests"
-
-      - name: Test native lyric timeline
-        run: |
-          swiftc src-tauri/plugins/lyric-pip/ios/Sources/LyricTimeline.swift scripts/ios-lyric-tests/main.swift -o "$RUNNER_TEMP/splayer-lyric-tests"
-          "$RUNNER_TEMP/splayer-lyric-tests"
-
-      - name: Install the SPlayer iOS icon set
-        shell: bash
-        run: |
-          set -euo pipefail
-          icon_set="src-tauri/gen/apple/Assets.xcassets/AppIcon.appiconset"
-          cp src-tauri/icons/ios/*.png "$icon_set/"
-          cmp src-tauri/icons/ios/AppIcon-512@2x.png "$icon_set/AppIcon-512@2x.png"
-
-      - name: Build the unsigned iOS IPA
-        run: pnpm tauri ios build --ci --no-sign
-
-      - name: Collect unsigned IPA
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          ipa_path="$(find src-tauri -type f -name '*.ipa' -print -quit)"
-          if [[ -z "$ipa_path" ]]; then
-            echo "Tauri did not produce an IPA" >&2
-            exit 1
-          fi
-          python3 scripts/optimize-ios-ipa.py "$ipa_path" SPlayer-Next-iOS-unsigned.ipa
-          # 验证最终安装包确实开放文稿共享，不启动模拟器。
-          inspect_dir="$(mktemp -d)"
-          unzip -q "$ipa_path" 'Payload/*.app/Info.plist' -d "$inspect_dir"
-          info_path="$(find "$inspect_dir/Payload" -name Info.plist -print -quit)"
-          test "$(/usr/libexec/PlistBuddy -c 'Print :UIFileSharingEnabled' "$info_path")" = true
-          test "$(/usr/libexec/PlistBuddy -c 'Print :LSSupportsOpeningDocumentsInPlace' "$info_path")" = true
-          python3 scripts/ios-siri-tests/verify-ipa.py "$ipa_path"
-
-      - name: Upload unsigned IPA
-        uses: actions/upload-artifact@v4
-        with:
-          name: SPlayer-Next-iOS-unsigned-${{ github.sha }}
-          path: SPlayer-Next-iOS-unsigned.ipa
-          if-no-files-found: error
-          compression-level: 0
-          retention-days: 14
+    uses: ./.github/workflows/build-ios-ipa.yml
+    with:
+      ref: ${{ github.sha }}
+      artifact-name: SPlayer-Next-iOS-unsigned-${{ github.sha }}
+      ipa-name: SPlayer-Next-iOS-unsigned.ipa
+      retention-days: 14
 
   publish-action:
     name: Publish Action update channel

@@ -12,44 +12,37 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/SPlayer-Dev/SPlayer-Next.git
-cd SPlayer-Next
+git clone https://github.com/Aruvelut-123/SPlayer-Next-ios15.git
+cd SPlayer-Next-ios15
 
 # 安装依赖
 pnpm install
 
-# 启动开发（先以 debug 构建原生模块，再启动 Electron）
-pnpm dev
+# 启动移动端网页预览（浏览器中调试界面）
+pnpm mobile:dev
 
-# 启动开发时向程序传递参数
-pnpm dev -- [参数]...
+# 在 iOS 模拟器或真机上运行（需 macOS 与 Xcode）
+pnpm ios:dev
 ```
 
 只做界面开发、想跳过 Rust 编译时，可设置 `SKIP_NATIVE_BUILD=true`。
 
 ## 构建
 
-基础命令
+本项目只发布 iOS / iPadOS 版本，产物为未签名 IPA。
 
 ```bash
-pnpm build         # 完整构建：清理 → 原生模块 → 类型检查 → electron-vite
-pnpm build:win     # 打包 Windows
-pnpm build:mac     # 打包 macOS
-pnpm build:linux   # 打包 Linux
+pnpm mobile:build   # 构建 iOS 移动端前端资源（Siri 扩展 + 主包，并校验产物完整性）
+pnpm ios:build      # 调用 Tauri 构建 iOS 应用（需 macOS 与 Xcode）
 ```
 
-高级命令
+首次在本地初始化 iOS 工程：
 
 ```bash
-# 上面的构建命令默认会构建当前平台和架构的全部 target。可以通过下面的方法指定只打包某些 target
-pnpm build:win nsis       # 打包 Windows 的 nsis 格式
-pnpm build:mac dmg        # 打包 macOS 的 dmg 格式
-pnpm build:linux tar.gz   # 打包 Linux 的 tar.gz 格式
-# 全部 target 的列表详见 https://www.electron.build/docs/targets
-
-# 仅构建未打包的程序目录，常用于本地测试（在 dist/xxx-unpacked 目录）
-pnpm build:unpack
+pnpm ios:init       # 生成 src-tauri/gen/apple
 ```
+
+正式发布与日常构建均由 GitHub Actions 完成，详见 [iOS 构建](/ios-unsigned)。
 
 ## 常用脚本
 
@@ -58,17 +51,19 @@ pnpm typecheck        # tsc + vue-tsc（node + web 双目标）
 pnpm lint             # ESLint
 pnpm format           # Prettier
 pnpm build:native     # 仅构建 Rust 原生模块（加 `--dev` 为 debug 构建）
+pnpm test             # 运行 Node 与 Web 两套单元测试
 ```
 
 ## 项目结构
 
 ```
-electron/main/      主进程：窗口、IPC、原生模块、服务
-electron/preload/   预加载：通过 contextBridge 暴露 window.api
-src/                渲染层：Vue 3 单页应用
-windows/            桌面歌词 / 灵动岛 / 任务栏歌词等独立窗口
+src/                渲染层：Vue 3 单页应用（移动端入口见 src/mobile）
+src/mobile/         iOS 端平台适配：更新检测、Siri、原生播放器桥接等
+src-tauri/          Tauri 原生外壳与 iOS 工程配置
+electron/           共享的主进程逻辑（网络、登录、服务等），供移动端复用
 native/             Rust 原生模块（NAPI-RS）
 shared/             跨进程共享的类型与默认配置
+docs/               VitePress 文档
 ```
 
 ## 代码约定

@@ -4,21 +4,28 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 ## Project Overview
 
-SPlayer-Next — desktop music player on **Electron + Vue 3 + TypeScript**, with Rust native modules (NAPI-RS) for audio decoding, system media integration, and Windows taskbar lyric. Successor to SPlayer.
+SPlayer-Next for iOS / iPadOS — a mobile port of the [SPlayer-Next](https://github.com/SPlayer-Dev/SPlayer-Next) desktop player, built on **Tauri 2 + Vue 3 + TypeScript**, with the original Rust native modules (NAPI-RS) for audio decoding and system media integration.
+
+Only the iOS / iPadOS build is shipped. Desktop (Windows / macOS / Linux) and Android packaging have been removed; the Electron main-process sources under `electron/` are **retained** as shared logic and are reused by the mobile build through Vite path aliases (`@main` → `electron/main`). Do not delete code under `electron/` just because no desktop binary is produced.
 
 ## Commands
 
 ```bash
 pnpm install              # Install deps
-pnpm dev                  # Build native (debug) + start Electron dev
-pnpm build                # Full build (rimraf → native → typecheck → electron-vite)
-pnpm build:{win,mac,linux}# Platform packages
+pnpm mobile:dev           # Start the mobile web preview in a browser
+pnpm ios:dev              # Run on an iOS simulator/device (macOS + Xcode)
+pnpm ios:init             # Generate src-tauri/gen/apple (once)
+pnpm mobile:build         # Build the iOS frontend bundles (Siri extension + main) and verify them
+pnpm ios:build            # Build the iOS app via Tauri (macOS + Xcode)
 pnpm typecheck            # tsc + vue-tsc (node + web targets)
 pnpm lint / format        # ESLint / Prettier
+pnpm test                 # Node + Web unit tests
 pnpm build:native         # Rust only; add `--dev` for debug
 ```
 
 `SKIP_NATIVE_BUILD=true` skips Rust during dev.
+
+CI lives in `.github/workflows/`: `ci.yml` (checks), `build-ios-ipa.yml` (reusable macOS IPA build), `ios-unsigned.yml` (push/dispatch unsigned IPA), `release.yml` (`v*` tag → GitHub Release with the IPA), plus `ios-diagnostics.yml` and `ios-playback-test.yml` for on-device checks. The iOS in-app updater reads the GitHub Releases API directly (`src/mobile/update.ts`), so the IPA asset name and prerelease flags are part of the client contract.
 
 `audio-engine` static-links FFmpeg via the `ffmpeg_audio` crate (vendor zip + cc-built at compile time). Zero environment dependency — no `FFMPEG_DIR` / `PKG_CONFIG_PATH`, no system FFmpeg required.
 

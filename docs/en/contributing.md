@@ -11,35 +11,29 @@ Thank you for contributing to SPlayer-Next. This page covers the local environme
 ## Getting started
 
 ```bash
-git clone https://github.com/SPlayer-Dev/SPlayer-Next.git
-cd SPlayer-Next
+git clone https://github.com/Aruvelut-123/SPlayer-Next-ios15.git
+cd SPlayer-Next-ios15
 pnpm install
-pnpm dev
 
-# Pass arguments to the application
-pnpm dev -- [arguments]...
+# Preview the mobile UI in a browser
+pnpm mobile:dev
+
+# Run on an iOS simulator or device (requires macOS and Xcode)
+pnpm ios:dev
 ```
 
 Set `SKIP_NATIVE_BUILD=true` to skip Rust compilation during renderer-only development.
 
 ## Building
 
+This project ships iOS / iPadOS only, as an unsigned IPA.
+
 ```bash
-pnpm build
-pnpm build:win
-pnpm build:mac
-pnpm build:linux
-
-# Build selected electron-builder targets
-pnpm build:win nsis
-pnpm build:mac dmg
-pnpm build:linux tar.gz
-
-# Build unpacked output for local testing
-pnpm build:unpack
+pnpm mobile:build   # Build the iOS frontend bundles (Siri extension + main) and verify them
+pnpm ios:build      # Build the iOS app via Tauri (requires macOS and Xcode)
 ```
 
-See [electron-builder targets](https://www.electron.build/docs/targets) for all package targets.
+Run `pnpm ios:init` once to generate `src-tauri/gen/apple` locally.
 
 ## Common scripts
 
@@ -54,12 +48,13 @@ pnpm build:native --dev
 ## Project structure
 
 ```text
-electron/main/      Main process: windows, IPC, native modules, services
-electron/preload/   contextBridge APIs exposed as window.api
-src/                Vue 3 renderer application
-windows/            Desktop lyric, Dynamic Island, and taskbar lyric windows
+src/                Vue 3 renderer application (mobile entry lives in src/mobile)
+src/mobile/         iOS platform adaptation: updates, Siri, native player bridge
+src-tauri/          Tauri native shell and iOS project configuration
+electron/           Shared main-process logic (network, login, services) reused by mobile
 native/             Rust native modules built with NAPI-RS
 shared/             Cross-process types and defaults
+docs/               VitePress documentation
 ```
 
 ## Conventions
